@@ -72,7 +72,9 @@ func TestApplyEnvOverrides(t *testing.T) {
 func TestLoadFromFile(t *testing.T) {
 	dir := t.TempDir()
 	cfgDir := filepath.Join(dir, ".config", "export-key")
-	os.MkdirAll(cfgDir, 0755)
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	cfgContent := `backend: dotenv
 onepassword:
@@ -81,7 +83,9 @@ onepassword:
 dotenv:
   paths: [/secrets/.env]
 `
-	os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte(cfgContent), 0644)
+	if err := os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte(cfgContent), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	// Point HOME to temp dir so Load() finds our config
 	t.Setenv("HOME", dir)
@@ -113,10 +117,14 @@ dotenv:
 func TestLoadEnvOverridesFile(t *testing.T) {
 	dir := t.TempDir()
 	cfgDir := filepath.Join(dir, ".config", "export-key")
-	os.MkdirAll(cfgDir, 0755)
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
 	// Config file says 1password
-	os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte("backend: 1password\n"), 0644)
+	if err := os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte("backend: 1password\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("HOME", dir)
 	// Env var overrides to dotenv
@@ -151,9 +159,13 @@ func TestLoadNoConfigFile(t *testing.T) {
 func TestLoadInvalidYAML(t *testing.T) {
 	dir := t.TempDir()
 	cfgDir := filepath.Join(dir, ".config", "export-key")
-	os.MkdirAll(cfgDir, 0755)
+	if err := os.MkdirAll(cfgDir, 0755); err != nil {
+		t.Fatal(err)
+	}
 
-	os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte("{{invalid yaml"), 0644)
+	if err := os.WriteFile(filepath.Join(cfgDir, "config.yaml"), []byte("{{invalid yaml"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	t.Setenv("HOME", dir)
 
