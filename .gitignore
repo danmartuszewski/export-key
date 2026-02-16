@@ -1,5 +1,5 @@
 # Build artifacts
-export-key
+/export-key
 bin/
 dist/
 *.exe
