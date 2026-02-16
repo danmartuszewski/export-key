@@ -124,8 +124,12 @@ func TestDotenvMultipleFiles(t *testing.T) {
 	path1 := filepath.Join(dir, "a.env")
 	path2 := filepath.Join(dir, "b.env")
 
-	os.WriteFile(path1, []byte("KEY_A=from_a\n"), 0644)
-	os.WriteFile(path2, []byte("KEY_B=from_b\n"), 0644)
+	if err := os.WriteFile(path1, []byte("KEY_A=from_a\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path2, []byte("KEY_B=from_b\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	d := NewDotenv([]string{path1, path2})
 	items, err := d.ListItems()
@@ -228,7 +232,9 @@ func TestDotenvCaching(t *testing.T) {
 	}
 
 	// Overwrite file
-	os.WriteFile(path, []byte("KEY=modified\n"), 0644)
+	if err := os.WriteFile(path, []byte("KEY=modified\n"), 0644); err != nil {
+		t.Fatal(err)
+	}
 
 	// Should still return cached value
 	val2, _ := d.GetSecret("KEY")
