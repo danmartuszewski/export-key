@@ -1,0 +1,3 @@
+backend: dotenv
+dotenv:
+  paths: [/root/.secrets.env]

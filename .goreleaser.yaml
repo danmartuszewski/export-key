@@ -1,0 +1,41 @@
+project_name: export-key
+
+builds:
+  - main: ./cmd/export-key
+    binary: export-key
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w
+      - -X github.com/danmartuszewski/export-key/internal/cmd.Version={{.Version}}
+      - -X github.com/danmartuszewski/export-key/internal/cmd.Commit={{.Commit}}
+      - -X github.com/danmartuszewski/export-key/internal/cmd.BuildDate={{.Date}}
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+
+brews:
+  - repository:
+      owner: danmartuszewski
+      name: tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    homepage: https://github.com/danmartuszewski/export-key
+    description: Export API keys from 1Password or dotenv as environment variables
+    license: MIT
+    install: |
+      bin.install "export-key"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
