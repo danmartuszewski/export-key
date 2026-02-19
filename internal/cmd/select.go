@@ -115,8 +115,8 @@ func exportSingle(b backend.Backend, item keyitem.KeyItem) error {
 	fmt.Printf("export %s=%q\n", item.EnvVar, secret)
 
 	// Feedback on stderr so user sees it but it doesn't get eval'd
-	if item.Project != "" {
-		fmt.Fprintf(os.Stderr, "Exported %s [%s]\n", item.EnvVar, item.Project)
+	if item.HasProject() {
+		fmt.Fprintf(os.Stderr, "Exported %s [%s]\n", item.EnvVar, item.ProjectString())
 	} else {
 		fmt.Fprintf(os.Stderr, "Exported %s\n", item.EnvVar)
 	}

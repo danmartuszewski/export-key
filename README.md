@@ -68,21 +68,23 @@ Item titles in 1Password follow this pattern:
 ```
 ENV_VAR_NAME           -> env var: ENV_VAR_NAME, no project
 ENV_VAR_NAME-project   -> env var: ENV_VAR_NAME, project: project
+ENV_VAR_NAME-a,b       -> env var: ENV_VAR_NAME, projects: a, b
 ```
 
-Everything before the first `-` becomes the environment variable name. Everything after is the project tag.
+Everything before the first `-` becomes the environment variable name. Everything after is a comma-separated list of project tags.
 
 ### Project grouping
 
-Keys sharing the same suffix belong to the same project:
+Keys sharing the same project tag belong to the same project. A key can belong to multiple projects:
 
 ```
-OPENAI_API_KEY-myapp   -> project: myapp
-STRIPE_KEY-myapp       -> project: myapp
-AWS_ACCESS_KEY         -> no project
+OPENAI_API_KEY-myapp       -> project: myapp
+STRIPE_KEY-myapp           -> project: myapp
+SHARED_KEY-myapp,infra     -> projects: myapp, infra
+AWS_ACCESS_KEY             -> no project
 ```
 
-`ek .myapp` (or `ek -p myapp`) exports all keys tagged with that project at once.
+`ek .myapp` (or `ek -p myapp`) exports all keys tagged with that project at once. `SHARED_KEY` above would be included in both `ek .myapp` and `ek .infra`.
 
 ## Security
 

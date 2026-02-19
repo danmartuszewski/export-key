@@ -260,7 +260,7 @@ func (m *model) applyFilter() {
 	for i, item := range m.items {
 		if fuzzyMatch(lower, strings.ToLower(item.Title)) ||
 			fuzzyMatch(lower, strings.ToLower(item.EnvVar)) ||
-			fuzzyMatch(lower, strings.ToLower(item.Project)) {
+			fuzzyMatch(lower, strings.ToLower(item.ProjectString())) {
 			m.filtered = append(m.filtered, i)
 		}
 	}
@@ -346,9 +346,9 @@ func (m model) View() string {
 		b.WriteString("  ")
 
 		// Full title (dim the project suffix after the first -)
-		if item.Project != "" {
+		if item.HasProject() {
 			base := item.EnvVar
-			suffix := "-" + item.Project
+			suffix := "-" + item.ProjectString()
 			padLen := m.maxTitleLen - len(item.Title)
 			pad := ""
 			if padLen > 0 {
@@ -373,8 +373,8 @@ func (m model) View() string {
 		}
 
 		// Project tag
-		if item.Project != "" {
-			tag := fmt.Sprintf("  [%s]", item.Project)
+		if item.HasProject() {
+			tag := fmt.Sprintf("  [%s]", item.ProjectString())
 			if isCursor {
 				b.WriteString(selectedProjectStyle.Render(tag))
 			} else {

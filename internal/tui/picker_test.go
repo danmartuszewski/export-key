@@ -104,7 +104,7 @@ func testItems(count int) []keyitem.KeyItem {
 		items[i-1] = keyitem.KeyItem{
 			Title:   envVar + "-project",
 			EnvVar:  envVar,
-			Project: "project",
+			Projects: []string{"project"},
 		}
 	}
 

@@ -1,6 +1,9 @@
 package keyitem
 
-import "strings"
+import (
+	"slices"
+	"strings"
+)
 
 // KeyItem represents a secret item from any backend.
 type KeyItem struct {
@@ -8,23 +11,45 @@ type KeyItem struct {
 	Title string
 	// EnvVar is the derived environment variable name (e.g. "OPENAI_API_KEY").
 	EnvVar string
-	// Project is the project name extracted from the suffix (e.g. "myapp"), empty if none.
-	Project string
+	// Projects are the project names extracted from the suffix, comma-separated.
+	// e.g. "myapp" or ["web", "api"] from title "KEY-web,api".
+	Projects []string
+}
+
+// HasProject reports whether the item is assigned to at least one project.
+func (k KeyItem) HasProject() bool {
+	return len(k.Projects) > 0
+}
+
+// ProjectString returns the projects joined by comma for display.
+func (k KeyItem) ProjectString() string {
+	return strings.Join(k.Projects, ",")
 }
 
 // Parse creates a KeyItem from a raw title string.
 // Convention: everything before the first "-" is the env var name,
-// everything after is the project name.
+// everything after is comma-separated project names.
 func Parse(title string) KeyItem {
 	item := KeyItem{Title: title}
 
 	idx := strings.Index(title, "-")
 	if idx == -1 {
 		item.EnvVar = title
-		item.Project = ""
-	} else {
-		item.EnvVar = title[:idx]
-		item.Project = title[idx+1:]
+		return item
+	}
+
+	item.EnvVar = title[:idx]
+	raw := title[idx+1:]
+	if raw == "" {
+		return item
+	}
+
+	parts := strings.Split(raw, ",")
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			item.Projects = append(item.Projects, p)
+		}
 	}
 
 	return item
@@ -43,7 +68,9 @@ func ParseAll(titles []string) []KeyItem {
 func FilterByProject(items []KeyItem, project string) []KeyItem {
 	var filtered []KeyItem
 	for _, item := range items {
-		if item.Project == project {
+		if project == "" && !item.HasProject() {
+			filtered = append(filtered, item)
+		} else if slices.Contains(item.Projects, project) {
 			filtered = append(filtered, item)
 		}
 	}

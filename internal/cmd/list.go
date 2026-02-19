@@ -77,9 +77,9 @@ func runList(cmd *cobra.Command, args []string) error {
 
 		// Split title: base in normal color, project suffix dimmer
 		var titleRendered string
-		if item.Project != "" {
+		if item.HasProject() {
 			base := item.EnvVar
-			suffix := "-" + item.Project
+			suffix := "-" + item.ProjectString()
 			padLen := maxTitle - len(item.Title)
 			pad := ""
 			if padLen > 0 {
@@ -91,8 +91,8 @@ func runList(cmd *cobra.Command, args []string) error {
 		}
 
 		projectCol := ""
-		if item.Project != "" {
-			projectCol = tui.ListProjectTagStyle.Render(item.Project)
+		if item.HasProject() {
+			projectCol = tui.ListProjectTagStyle.Render(item.ProjectString())
 		}
 
 		fmt.Fprintf(os.Stderr, "  %s  %s  %s  %s\n",
