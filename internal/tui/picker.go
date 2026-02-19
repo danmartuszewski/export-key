@@ -122,6 +122,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.quitting = true
 			return m, tea.Quit
 
+		case "ctrl+a":
+			// Export all visible (filtered) items
+			if len(m.filtered) > 0 {
+				var items []keyitem.KeyItem
+				for _, idx := range m.filtered {
+					items = append(items, m.items[idx])
+				}
+				m.result = PickerResult{Items: items}
+				m.quitting = true
+				return m, tea.Quit
+			}
+			return m, nil
+
 		case " ":
 			// Toggle selection on current item
 			if len(m.filtered) > 0 {
@@ -380,7 +393,7 @@ func (m model) View() string {
 
 	// Help footer
 	b.WriteString("\n  ")
-	b.WriteString(helpStyle.Render("↑/k up  ↓/j down  g/G top/bottom  space select  enter export  q quit"))
+	b.WriteString(helpStyle.Render("↑/k up  ↓/j down  g/G top/bottom  space select  enter export  ^a export all visible  q quit"))
 	b.WriteString("\n")
 
 	content := b.String()
