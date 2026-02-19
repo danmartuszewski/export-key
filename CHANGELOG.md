@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.0](https://github.com/danmartuszewski/export-key/compare/v1.0.0...v1.1.0) (2026-02-19)
+
+
+### Features
+
+* add ctrl+a to export all visible keys at once ([699e699](https://github.com/danmartuszewski/export-key/commit/699e699740fbbe7ccee36462b49034b7d2aff243))
+* bottom-align TUI picker in tall terminals ([b4ad73f](https://github.com/danmartuszewski/export-key/commit/b4ad73f3ba20ab2155a355d144dcbcb47c1cca6f))
+* cache 1Password item list for 30s ([c6eb5a5](https://github.com/danmartuszewski/export-key/commit/c6eb5a5f1d80c26484d9794faab7daef7e47c05c))
+* support comma-separated multi-project key assignment ([6a2a8c8](https://github.com/danmartuszewski/export-key/commit/6a2a8c8db34a840112b5a9c5edd7f9fb7b7efd8c))
+
+
+### Bug Fixes
+
+* number input UX, color support in Warp, and macOS install ([725dbc2](https://github.com/danmartuszewski/export-key/commit/725dbc2fa379ef5d877e8c26a5db41aee82994a5))
+
 ## 1.0.0 (2026-02-16)
 
 
