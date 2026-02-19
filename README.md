@@ -29,7 +29,7 @@ export-key list              # list available keys
 
 ## How it works
 
-A Go binary outputs `export VAR="value"` to stdout. A thin shell function `eval`s it, setting the variable in your current shell. The TUI renders on stderr so it doesn't interfere with the export. Same proven pattern as direnv, fnm, and rbenv.
+A Go binary outputs `export VAR="value"` to stdout. A thin shell function `eval`s it, setting the variable in your current shell. The TUI renders on stderr so it doesn't interfere with the export. Same pattern used by direnv, fnm, and rbenv.
 
 ## Install
 
@@ -83,6 +83,29 @@ AWS_ACCESS_KEY         -> no project
 ```
 
 `ek .myapp` (or `ek -p myapp`) exports all keys tagged with that project at once.
+
+## Security
+
+Common ways secrets get leaked and how export-key handles them:
+
+| Risk | Traditional approach | export-key |
+|---|---|---|
+| **Secrets in dotfiles** | `export KEY="sk-..."` hardcoded in `.bashrc` or `.zshrc` | Keys are fetched on demand, never written to shell config |
+| **Secrets in shell history** | `export KEY="sk-..."` saved in `.zsh_history` | Only `ek openai` appears in history, never the secret value |
+| **Secrets in clipboard** | Copy-paste from 1Password leaves secrets in clipboard history | Secrets go directly from the vault to your shell, no clipboard involved |
+| **Secrets committed to git** | `.env` files accidentally checked in | With 1Password backend, there are no local files to commit |
+| **Secrets shared across sessions** | `.env` loaded at shell startup persists across all terminals | Keys live only in the shell session where you exported them |
+| **Secrets read by AI agents** | Coding agents (Claude Code, Codex, Warp AI) can read `.env` files, shell history, and dotfiles in your project | No local secret files to read - keys exist only as in-memory env vars in your shell session |
+
+Even with the dotenv backend, export-key is safer than `source .env` - keys are loaded selectively (only what you pick) and on demand (not at every shell startup).
+
+### AI coding agents and your secrets
+
+Coding agents like Claude Code, Codex, and Warp AI read your shell configuration files (`.bashrc`, `.zshrc`, `.profile`) as part of their normal operation. If your API keys are in those files, every agent session has direct access to them.
+
+Even with the dotenv backend, storing secrets in a dedicated `.env` file that only export-key references is much better than putting them in `.zshrc`. Your `.env` can live outside the project directory (e.g. `~/.secrets.env`) where agents have no reason to look. No agent knows the file exists or where to find it. You can also block agents from reading it through their configuration (e.g. `.claude/settings.json` for Claude Code or `.codexrc` for Codex).
+
+Agents will always read `.zshrc` because it's a standard file in a known location. A custom `.env` path that only export-key references through its own config is invisible to them by default.
 
 ## Backends
 
