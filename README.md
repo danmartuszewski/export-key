@@ -1,12 +1,31 @@
-# export-key
+<p align="center">
+  <img src="assets/icon.png" height="128">
+</p>
 
-Export API keys from 1Password (or dotenv files) as environment variables with a single command.
+<h1 align="center">export-key</h1>
 
+<p align="center">
+  Stop hunting for API keys. Just <code>ek</code> and they're in your shell.
+</p>
+
+## Why export-key?
+
+```bash
+# Before: copy-pasting from 1Password, managing .env files
+op item get "OPENAI_API_KEY" --vault CLI --fields credential | pbcopy
+export OPENAI_API_KEY="sk-..."
+
+# After
+ek openai
 ```
-$ ek
-```
 
-An interactive TUI picker lets you fuzzy-search, navigate with arrow keys, or type a number to instantly export any key.
+```bash
+ek                           # interactive fuzzy picker
+ek 3                         # export by number
+ek openai                    # fuzzy match by name
+ek .myapp                    # export all keys for a project
+export-key list              # list available keys
+```
 
 ## How it works
 
@@ -14,13 +33,13 @@ A Go binary outputs `export VAR="value"` to stdout. A thin shell function `eval`
 
 ## Install
 
-### Homebrew
+### Homebrew (macOS/Linux)
 
 ```bash
 brew install danmartuszewski/tap/export-key
 ```
 
-### From source
+### Go
 
 ```bash
 go install github.com/danmartuszewski/export-key/cmd/export-key@latest
@@ -41,26 +60,6 @@ ek() { eval "$(export-key select "$@")"; }
 ```
 
 Both define the `ek` function that wraps `export-key select`. The `init` variant stays in sync with binary updates automatically.
-
-## Usage
-
-```bash
-# Interactive picker (fuzzy search, arrow keys, or type a number)
-ek
-
-# Export by number (from the list)
-ek 3
-
-# Export by name (fuzzy match)
-ek openai
-
-# Export all keys for a project
-ek .myapp
-ek -p myapp  # long form
-
-# List available keys
-export-key list
-```
 
 ## Key naming convention
 
@@ -119,6 +118,22 @@ dotenv:
 | `EK_FIELD` | 1Password field name |
 | `EK_DOTENV_PATHS` | Colon-separated dotenv file paths |
 
+## Project Structure
+
+```
+export-key/
+├── cmd/export-key/    # Main entry point
+├── internal/
+│   ├── backend/       # Backend interface & implementations (1Password, dotenv)
+│   ├── cmd/           # CLI commands (cobra)
+│   ├── config/        # Configuration loading
+│   ├── keyitem/       # Key naming parser (ENV_VAR-project)
+│   ├── shell/         # Shell init script generation
+│   └── tui/           # Interactive picker (bubbletea)
+├── Makefile
+└── README.md
+```
+
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) for details.
