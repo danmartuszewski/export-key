@@ -55,6 +55,7 @@ type model struct {
 
 	maxEnvLen   int
 	maxTitleLen int
+	termHeight  int
 }
 
 func newModel(items []keyitem.KeyItem, version string) model {
@@ -87,6 +88,10 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		m.termHeight = msg.Height
+		return m, nil
+
 	case tea.KeyMsg:
 		key := msg.String()
 
@@ -378,5 +383,17 @@ func (m model) View() string {
 	b.WriteString(helpStyle.Render("↑/k up  ↓/j down  g/G top/bottom  space select  enter export  q quit"))
 	b.WriteString("\n")
 
-	return b.String()
+	content := b.String()
+
+	// Bottom-align: pad with empty lines so content sits at the bottom
+	// of the terminal instead of the top.
+	if m.termHeight > 0 {
+		contentLines := strings.Count(content, "\n")
+		padding := m.termHeight - contentLines
+		if padding > 0 {
+			content = strings.Repeat("\n", padding) + content
+		}
+	}
+
+	return content
 }
