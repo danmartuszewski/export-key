@@ -30,7 +30,8 @@ clean:
 	rm -rf bin/ dist/ coverage.out coverage.html
 
 install: build
-	cp bin/$(BINARY_NAME) $(GOPATH)/bin/
+	cp bin/$(BINARY_NAME) /usr/local/bin/
+	codesign --sign - --force /usr/local/bin/$(BINARY_NAME)
 
 deps:
 	go mod download

@@ -23,6 +23,8 @@ func init() {
 }
 
 func runList(cmd *cobra.Command, args []string) error {
+	tui.EnsureStderrRenderer()
+
 	cfg, err := config.Load()
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)

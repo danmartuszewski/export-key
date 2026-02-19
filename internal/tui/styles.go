@@ -1,6 +1,56 @@
 package tui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"os"
+	"sync"
+
+	"github.com/charmbracelet/lipgloss"
+)
+
+var rendererOnce sync.Once
+
+// EnsureStderrRenderer configures all styles to detect color support from stderr.
+// It is intentionally lazy so non-TUI commands (including --help) don't do terminal
+// probing during package initialization.
+func EnsureStderrRenderer() {
+	rendererOnce.Do(func() {
+		stderrRenderer := lipgloss.NewRenderer(os.Stderr)
+		lipgloss.SetDefaultRenderer(stderrRenderer)
+
+		bind := func(s lipgloss.Style) lipgloss.Style {
+			return s.Renderer(stderrRenderer)
+		}
+
+		titleStyle = bind(titleStyle)
+		versionStyle = bind(versionStyle)
+		promptStyle = bind(promptStyle)
+		numberStyle = bind(numberStyle)
+		selectedNumberStyle = bind(selectedNumberStyle)
+		envVarStyle = bind(envVarStyle)
+		selectedEnvVarStyle = bind(selectedEnvVarStyle)
+		titleColumnStyle = bind(titleColumnStyle)
+		titleSuffixStyle = bind(titleSuffixStyle)
+		selectedTitleColumnStyle = bind(selectedTitleColumnStyle)
+		selectedTitleSuffixStyle = bind(selectedTitleSuffixStyle)
+		projectStyle = bind(projectStyle)
+		selectedProjectStyle = bind(selectedProjectStyle)
+		cursorStyle = bind(cursorStyle)
+		helpStyle = bind(helpStyle)
+		filterInputStyle = bind(filterInputStyle)
+		checkStyle = bind(checkStyle)
+		uncheckStyle = bind(uncheckStyle)
+		selectedCountStyle = bind(selectedCountStyle)
+
+		ListHeaderStyle = bind(ListHeaderStyle)
+		ListNumberStyle = bind(ListNumberStyle)
+		ListEnvVarStyle = bind(ListEnvVarStyle)
+		ListTitleStyle = bind(ListTitleStyle)
+		ListTitleSuffixStyle = bind(ListTitleSuffixStyle)
+		ListProjectStyle = bind(ListProjectStyle)
+		ListProjectTagStyle = bind(ListProjectTagStyle)
+		ListSeparatorStyle = bind(ListSeparatorStyle)
+	})
+}
 
 // Color palette aligned with hop
 var (

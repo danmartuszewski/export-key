@@ -25,6 +25,8 @@ type PickerResult struct {
 
 // RunPicker shows the interactive TUI picker on stderr and returns the selection.
 func RunPicker(items []keyitem.KeyItem, version string) (PickerResult, error) {
+	EnsureStderrRenderer()
+
 	m := newModel(items, version)
 
 	p := tea.NewProgram(m,
@@ -202,17 +204,20 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if len(key) == 1 {
 			m.filter += key
 
-			// Check if the entire filter is a number -> direct select
+			// If the filter is a number, jump the cursor to that item
+			// instead of fuzzy filtering. User confirms with Enter.
 			if num, err := strconv.Atoi(m.filter); err == nil {
-				displayNum := num - 1 // user sees 1-based numbers
-				if displayNum >= 0 && displayNum < len(m.items) {
-					m.result = PickerResult{
-						Item:  m.items[displayNum],
-						Index: displayNum,
+				idx := num - 1 // user sees 1-based numbers
+				if idx >= 0 && idx < len(m.items) {
+					// Find this item's position in the filtered list
+					for i, fi := range m.filtered {
+						if fi == idx {
+							m.cursor = i
+							break
+						}
 					}
-					m.quitting = true
-					return m, tea.Quit
 				}
+				return m, nil
 			}
 
 			m.applyFilter()
