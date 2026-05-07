@@ -61,6 +61,68 @@ ek() { eval "$(export-key select "$@")"; }
 
 Both define the `ek` function that wraps `export-key select`. The `init` variant stays in sync with binary updates automatically.
 
+## Coding agents
+
+Install the export-key agent skill so coding agents (Claude Code, Codex, Cursor, Cline, and ~50 others) know how to load secrets via `ek` instead of asking you to paste API keys into chat:
+
+```bash
+npx skills add danmartuszewski/export-key
+```
+
+This places `SKILL.md` into your agent's skills directory. Distribution is powered by [vercel-labs/skills](https://github.com/vercel-labs/skills); the same command works across all supported agents.
+
+### Onboard your agent to export-key
+
+Paste the block below into your coding agent. It teaches the agent what export-key is, how to use it, and how to install it — so the agent can load secrets via `ek` instead of asking you to paste API keys into chat:
+
+````
+I use export-key to manage API keys and secrets. Use it for any task that needs
+a secret value — never ask me to paste secrets in chat, and never print a secret
+to the terminal.
+
+## What it is
+
+export-key is a CLI that exports a secret from 1Password (or a configured .env
+file) as an environment variable in the current shell. The shell function `ek`
+wraps it. Source: https://github.com/danmartuszewski/export-key
+
+## How to use it
+
+```bash
+ek OPENAI_API_KEY        # export a single key by env-var name
+ek .myproject            # export every key tagged with a project
+ek                       # interactive picker when the name is unknown
+export-key list          # list available keys without exporting
+```
+
+Item titles in the backend follow `ENV_VAR_NAME` or `ENV_VAR_NAME-project[,project2]`.
+Everything before the first `-` becomes the env-var name.
+
+## Rules
+
+- Use `ek` BEFORE asking me to paste a value.
+- Never `echo`, `printenv`, or otherwise print a secret. To verify presence:
+  `[ -n "$VAR" ] && echo set || echo missing`.
+- `ek` modifies the CURRENT shell. Run dependent commands in the same shell
+  invocation (chain with `&&` if your tooling spawns a fresh shell per command).
+- If `ek` is missing, shell integration isn't loaded — tell me, don't modify
+  my shell config without asking.
+- If a key isn't found, tell me — don't guess at alternative names.
+
+## Install (only if not already installed — check `command -v export-key` first)
+
+1. Binary:
+   - macOS/Linux with Homebrew: `brew install danmartuszewski/tap/export-key`
+   - Otherwise: `go install github.com/danmartuszewski/export-key/cmd/export-key@latest`
+2. Shell integration: detect my shell from $SHELL, then add
+   `eval "$(export-key init <shell>)"` to the matching rc file (~/.zshrc,
+   ~/.bashrc, or ~/.config/fish/config.fish). Skip if the line is already there.
+   Ask me before modifying the file.
+3. Agent skill (so this onboarding is loaded automatically next time):
+   `npx skills add danmartuszewski/export-key`
+4. Verify with `export-key version`.
+````
+
 ## Key naming convention
 
 Item titles in 1Password follow this pattern:
